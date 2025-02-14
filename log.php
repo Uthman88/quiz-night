@@ -53,8 +53,23 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <meta charset="UTF-8">
     <title>Connexion / Inscription</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        .back-btn:hover {
+            color: #0056b3;
+        }
+    </style>
 </head>
 <body>
+    <a href="index.php" class="back-btn">←</a>
+
     <h1>Connexion / Inscription</h1>
     <?php if (!empty($error)) echo "<p>$error</p>"; ?>
 
