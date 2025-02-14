@@ -14,22 +14,44 @@ $questionManager = new Question($db);
 // Gestion des actions (ajout, modification, suppression)
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $action = $_POST['action'];
-    $theme = $_POST['theme'];
-    $data = $_POST;
 
-    switch ($action) {
-        case 'add':
-            $questionManager->addQuestion($theme, $data);
-            break;
-        case 'edit':
-            $questionManager->editQuestion($theme, $data);
-            break;
-        case 'delete':
-            $questionManager->deleteQuestion($theme, $data['id']);
-            break;
+    if ($action === 'add_theme') {
+        // Ajout d'un nouveau thème
+        $theme = $_POST['new_theme'];
+        $theme = strtolower($theme); // Normaliser le nom du thème
+        $sql = "CREATE TABLE $theme (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            question TEXT NOT NULL,
+            reponse1 VARCHAR(255) NOT NULL,
+            reponse2 VARCHAR(255) NOT NULL,
+            reponse3 VARCHAR(255) NOT NULL,
+            reponse4 VARCHAR(255) NOT NULL,
+            bonne_reponse INT NOT NULL
+        )";
+        if ($db->getConnection()->query($sql)) {
+            header('Location: admin.php'); // Recharger la page après l'ajout
+            exit;
+        } else {
+            $error = "Erreur lors de la création du thème.";
+        }
+    } else {
+        $theme = $_POST['theme'];
+        $data = $_POST;
+
+        switch ($action) {
+            case 'add':
+                $questionManager->addQuestion($theme, $data);
+                break;
+            case 'edit':
+                $questionManager->editQuestion($theme, $data);
+                break;
+            case 'delete':
+                $questionManager->deleteQuestion($theme, $data['id']);
+                break;
+        }
+        header('Location: admin.php');  // Recharger la page après l'action
+        exit;
     }
-    header('Location: admin.php');  // Recharger la page après l'action
-    exit;
 }
 
 $themes = $questionManager->getThemes();
@@ -45,7 +67,15 @@ $themes = $questionManager->getThemes();
     <h1>Admin Panel</h1>
     <a href="log.php" class="back-btn">Retour à la connexion</a>
 
+    <!-- Formulaire pour ajouter un thème -->
+    <h2>Ajouter un thème</h2>
+    <form method="post">
+        <input type="text" name="new_theme" placeholder="Nom du thème" required>
+        <button type="submit" name="action" value="add_theme">Ajouter Thème</button>
+    </form>
+
     <!-- Formulaire pour ajouter une question -->
+    <h2>Ajouter une question</h2>
     <form method="post">
         <select name="theme">
             <?php foreach ($themes as $theme): ?>
